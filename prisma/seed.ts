@@ -106,7 +106,7 @@ async function main() {
       data: {
         question: question.question,
         answers: {
-          create: [...answers],
+          create: answers,
         },
       },
     });

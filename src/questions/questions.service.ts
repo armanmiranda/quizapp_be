@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable({})
 export class QuestionsService {
+  private readonly logger = new Logger(QuestionsService.name);
   constructor(private prisma: PrismaService) {}
 
   async index() {
@@ -10,8 +11,8 @@ export class QuestionsService {
       const questions = await this.prisma.question.findMany();
       return { status: 200, data: questions };
     } catch (e) {
-      console.log(e);
-      return { status: 500, data: [] };
+      this.logger.error(e);
+      return { status: 500, message: 'Internal Error' };
     }
   }
 
@@ -32,8 +33,8 @@ export class QuestionsService {
       });
       return { status: 200, data: questions };
     } catch (e) {
-      console.log(e);
-      return { status: 500, data: [] };
+      this.logger.error(e);
+      return { status: 500, message: 'Internal Error' };
     }
   }
 }
