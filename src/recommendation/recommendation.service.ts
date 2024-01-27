@@ -10,7 +10,7 @@ export class RecommendationService {
   async index() {
     try {
       const recommendations = await this.prisma.recommendation.findMany();
-      return { status: 200, data: recommendations };
+      return { status: 200, recommendations };
     } catch (e) {
       this.logger.error(e);
       return { status: 500, message: 'Internal Error' };
@@ -23,16 +23,18 @@ export class RecommendationService {
     let correctCount = 0;
 
     try {
-      await dto.answers.map(async (answer) => {
+      const scoreBoard = await Promise.all(dto.answers.map(async (answer) => {
         const question = await this.prisma.answer.findFirstOrThrow({
           where: { questionId: answer.questionId, correctAnswer: true },
         });
 
-        if (question.id === answer.answerId) correctCount += 1;
-      });
+        return question.id === answer.answerId ? 1 : 0;
+      }));
 
-      correctPercentage = Math.floor((correctCount / 6) * 100);
-      console.log(correctCount, correctPercentage);
+      correctCount = scoreBoard.reduce((sum: number, currentNumber: number) =>
+        sum + currentNumber, 0);
+
+      correctPercentage = Math.ceil((correctCount / 6) * 100);
 
       if (correctPercentage < 50) {
         recommendations = await this.getRecommendationWithLevel(
@@ -58,6 +60,11 @@ export class RecommendationService {
   async getRecommendationWithLevel(level: ProgramLevel) {
     return await this.prisma.recommendation.findMany({
       where: { programLevel: level },
+      select: {
+        id: true,
+        programCode: true,
+        programName: true,
+      }
     });
   }
 }

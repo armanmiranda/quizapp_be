@@ -17,7 +17,7 @@ export class QuestionsService {
           },
         },
       });
-      return { status: 200, data: questions };
+      return { status: 200, questions };
     } catch (e) {
       this.logger.error(e);
       return { status: 500, message: 'Internal Error' };
@@ -26,7 +26,7 @@ export class QuestionsService {
 
   async show(id: number) {
     try {
-      const questions = await this.prisma.question.findUniqueOrThrow({
+      const question = await this.prisma.question.findUniqueOrThrow({
         where: { id },
         select: {
           id: true,
@@ -36,7 +36,7 @@ export class QuestionsService {
           },
         },
       });
-      return { status: 200, data: questions };
+      return { status: 200, question };
     } catch (e) {
       this.logger.error(e);
       return { status: 500, message: 'Internal Error' };
