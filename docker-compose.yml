@@ -7,3 +7,24 @@ services:
     working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: quizapp
+    networks:
+      - quizapp
+
+  db:
+    image: postgres:16
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: quizapp
+    networks:
+      - quizapp
+
+networks:
+   quizapp:
